@@ -28,9 +28,7 @@ function! yankitute#execute(cmd, start, end, reg) abort
     let v:errmsg = substitute(v:exception, '.*:\zeE\d\+:\s', '', '')
     return 'echoerr v:errmsg'
   finally
-    if flags !~# 'n'
-      call winrestview(win)
-    endif
+    call winrestview(win)
   endtry
 
   let results = []
