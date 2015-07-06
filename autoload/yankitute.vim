@@ -1,3 +1,5 @@
+let s:supports_n_flag = v:version >= 704 || (v:version == 703 && has('patch627'))
+
 function! yankitute#execute(cmd, start, end, reg) abort
   let [reg, cmd] = a:reg =~? '[a-z0-9"]' ? [a:reg, a:cmd] : ['"', a:reg . a:cmd]
   let sep = strlen(cmd) ? cmd[0] : '/'
@@ -16,8 +18,8 @@ function! yankitute#execute(cmd, start, end, reg) abort
     let replace = replace[2:]
   endif
 
-  if v:version >= 704 || (v:version == 703 && has('patch627'))
-    let flags = 'n' .flags
+  if s:supports_n_flag
+    let flags = 'n' . flags
   else
     let flags = substitute(flags, '\Cn', '', 'g')
   endif
