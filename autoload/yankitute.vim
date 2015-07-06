@@ -18,17 +18,14 @@ function! yankitute#execute(cmd, start, end, reg) abort
     let replace = replace[2:]
   endif
 
-  if s:supports_n_flag
-    let flags = 'n' . flags
-  else
-    let flags = substitute(flags, '\Cn', '', 'g')
-  endif
+  let flags = s:supports_n_flag ? ('n' . flags) : substitute(flags, '\Cn', '', 'g')
+  let [flags, silent] = flags !~# 'c' ? [flags, 'silent '] : [substitute(flags, '\Cn', '', 'g'), '']
 
   let results = []
   let v:errmsg = ''
   let win = winsaveview()
   try
-    silent execute 'keepjumps ' . a:start . ',' . a:end . 's' . sep . pat . sep . '\=' . fn . sep . flags
+    execute 'keepjumps ' . silent . a:start . ',' . a:end . 's' . sep . pat . sep . '\=' . fn . sep . flags
   catch
     let v:errmsg = substitute(v:exception, '.*:\zeE\d\+:\s', '', '')
     return 'echoerr v:errmsg'
