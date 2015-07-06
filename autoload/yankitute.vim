@@ -21,6 +21,7 @@ function! yankitute#execute(cmd, start, end, reg) abort
   let flags = s:supports_n_flag ? ('n' . flags) : substitute(flags, '\Cn', '', 'g')
   let [flags, silent] = flags !~# 'c' ? [flags, 'silent '] : [substitute(flags, '\Cn', '', 'g'), '']
 
+  let modified = &modified
   let results = []
   let v:errmsg = ''
   let win = winsaveview()
@@ -31,6 +32,7 @@ function! yankitute#execute(cmd, start, end, reg) abort
     return 'echoerr v:errmsg'
   finally
     call winrestview(win)
+    let &modified = modified
   endtry
 
   if !is_sub_replace
