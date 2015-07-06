@@ -13,7 +13,7 @@ function! yankitute#execute(cmd, start, end, reg) abort
     let replace = '&'
   endif
   let is_sub_replace = replace =~ '^\\='
-  let fn = 'yankitute#' . (is_sub_replace ? 'eval' : 'gather') . '(results,replace)'
+  let fn = 's:' . (is_sub_replace ? 'eval' : 'gather') . '(results,replace)'
   if is_sub_replace
     let replace = replace[2:]
   endif
@@ -47,12 +47,12 @@ function! yankitute#execute(cmd, start, end, reg) abort
   return ''
 endfunction
 
-function! yankitute#gather(results, ...) abort
+function! s:gather(results, ...) abort
   call add(a:results, map(range(10), 'submatch(v:val)'))
   return submatch(0)
 endfunction
 
-function! yankitute#eval(results, replace) abort
+function! s:eval(results, replace) abort
   call add(a:results, eval(a:replace]))
   return submatch(0)
 endfunction
