@@ -36,10 +36,7 @@ function! yankitute#execute(cmd, start, end, reg) abort
   endtry
 
   if !is_sub_replace
-    for i in range(len(results))
-      let m = results[i]
-      let results[i] = substitute(replace, '\v%(%(\\\\)*\\)@<!%(\\(\d)|(\&))', '\=yankitute#replace(submatch(1),m)', 'g')
-    endfor
+    let results = map(results, 's:references(replace, v:val)')
   endif
 
   let [join, type] = join == '' ? ["\n", 'l'] : [join, 'c']
@@ -57,6 +54,10 @@ function! s:eval(results, replace) abort
   return submatch(0)
 endfunction
 
-function! yankitute#replace(char, matches) abort
+function! s:references(replace, matches) abort
+  return substitute(a:replace, '\v%(%(\\\\)*\\)@<!%(\\(\d)|(\&))', '\=s:replace(submatch(1),a:matches)', 'g')
+endfunction
+
+function! s:replace(char, matches) abort
   return get(a:matches, a:char == '&' ? 0 : a:char)
 endfunction
