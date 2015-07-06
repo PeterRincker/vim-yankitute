@@ -1,17 +1,20 @@
 function! yankitute#execute(cmd, start, end, reg) abort
   let [reg, cmd] = a:reg =~? '[a-z0-9"]' ? [a:reg, a:cmd] : ['"', a:reg . a:cmd]
   let sep = strlen(cmd) ? cmd[0] : '/'
-	let [pat, s:replace, flags, join; _] = split(cmd[1:], '\v([^\\](\\\\)*\\)@<!%d' . char2nr(sep), 1) + ['', '', '', '']
+	let [pat, replace, flags, join; _] = split(cmd[1:], '\v([^\\](\\\\)*\\)@<!%d' . char2nr(sep), 1) + ['', '', '', '']
 
   if pat != ''
     let @/ = pat
   endif
 
-  if s:replace == ''
-    let s:replace = '&'
+  if replace == ''
+    let replace = '&'
   endif
-  let is_sub_replace = s:replace =~ '^\\='
-  let fn = 'yankitute#' . (is_sub_replace ? 'eval' : 'gather') . '()'
+  let is_sub_replace = replace =~ '^\\='
+  let fn = 'yankitute#' . (is_sub_replace ? 'eval' : 'gather') . '(results,replace)'
+  if is_sub_replace
+    let replace = replace[2:]
+  endif
 
   if v:version >= 704 || (v:version == 703 && has('patch627'))
     let flags = 'n' .flags
@@ -19,7 +22,7 @@ function! yankitute#execute(cmd, start, end, reg) abort
     let flags = substitute(flags, '\Cn', '', 'g')
   endif
 
-  let s:results = []
+  let results = []
   let v:errmsg = ''
   let win = winsaveview()
   try
@@ -31,27 +34,24 @@ function! yankitute#execute(cmd, start, end, reg) abort
     call winrestview(win)
   endtry
 
-  let results = []
-  if is_sub_replace
-    let results = s:results
-  else
-    for m in s:results
-      call add(results, substitute(s:replace, '\v%(%(\\\\)*\\)@<!%(\\(\d)|(\&))', '\=get(m,submatch(1)=="&"?0:submatch(1))', 'g'))
+  if !is_sub_replace
+    for i in range(len(results))
+      let m = results[i]
+      let results[i] = substitute(replace, '\v%(%(\\\\)*\\)@<!%(\\(\d)|(\&))', '\=get(m,submatch(1)=="&"?0:submatch(1))', 'g')
     endfor
   endif
-  unlet s:results
 
   let [join, type] = join == '' ? ["\n", 'l'] : [join, 'c']
   call setreg(reg, join(results, join), type)
   return ''
 endfunction
 
-function! yankitute#gather() abort
-  let s:results += [map(range(10), 'submatch(v:val)')]
+function! yankitute#gather(results, ...) abort
+  call add(a:results, map(range(10), 'submatch(v:val)'))
   return submatch(0)
 endfunction
 
-function! yankitute#eval() abort
-  call add(s:results, eval(s:replace[2:]))
+function! yankitute#eval(results, replace) abort
+  call add(a:results, eval(a:replace]))
   return submatch(0)
 endfunction
