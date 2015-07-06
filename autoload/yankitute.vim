@@ -37,7 +37,7 @@ function! yankitute#execute(cmd, start, end, reg) abort
   if !is_sub_replace
     for i in range(len(results))
       let m = results[i]
-      let results[i] = substitute(replace, '\v%(%(\\\\)*\\)@<!%(\\(\d)|(\&))', '\=get(m,submatch(1)=="&"?0:submatch(1))', 'g')
+      let results[i] = substitute(replace, '\v%(%(\\\\)*\\)@<!%(\\(\d)|(\&))', '\=yankitute#replace(submatch(1),m)', 'g')
     endfor
   endif
 
@@ -54,4 +54,8 @@ endfunction
 function! yankitute#eval(results, replace) abort
   call add(a:results, eval(a:replace]))
   return submatch(0)
+endfunction
+
+function! yankitute#replace(char, matches) abort
+  return get(a:matches, a:char == '&' ? 0 : a:char)
 endfunction
