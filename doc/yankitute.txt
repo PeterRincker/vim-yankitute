@@ -22,7 +22,7 @@ SYNTAX                                         *yankitute-syntax* *:Yankitute*
 			used.
 			When [reg] is not supplied use the default register.
 			The results in [reg] will be linewise.
-			[reg] must be one of {a-zA-Z0-9"}.
+			[reg] must be one of {a-zA-Z0-9"+*}.
 
 :[range]Yankitute [reg]/{pattern}/{replace}/[flags]
 			Same as |:Yankitute| but do a replacement on each

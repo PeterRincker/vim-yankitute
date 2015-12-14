@@ -1,7 +1,7 @@
 let s:supports_n_flag = v:version >= 704 || (v:version == 703 && has('patch627'))
 
 function! yankitute#execute(cmd, start, end, reg) abort
-  let [reg, cmd] = a:reg =~? '[a-z0-9"]' ? [a:reg, a:cmd] : ['"', a:reg . a:cmd]
+  let [reg, cmd] = a:reg =~? '[a-z0-9"+*]' ? [a:reg, a:cmd] : ['"', a:reg . a:cmd]
   let sep = strlen(cmd) ? cmd[0] : '/'
 	let [pat, replace, flags, join; _] = split(cmd[1:], '\v([^\\](\\\\)*\\)@<!%d' . char2nr(sep), 1) + ['', '', '', '']
 
