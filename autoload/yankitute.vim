@@ -39,6 +39,8 @@ function! yankitute#execute(cmd, start, end, reg) abort
     let results = map(results, 's:references(replace, v:val)')
   endif
 
+  let results = s:expand_returns(results)
+
   let [join, type] = join == '' ? ["\n", 'l'] : [join, 'c']
   call setreg(reg, join(results, join), type)
   return ''
@@ -60,4 +62,12 @@ endfunction
 
 function! s:replace(char, matches) abort
   return get(a:matches, a:char == '&' ? 0 : a:char)
+endfunction
+
+function! s:expand_returns(lst) abort
+  let arr = []
+  let pat = '\v%(%(\\\\)*\\)@<!%(\\r)'
+  call map(a:lst, 'split(v:val, pat)')
+  call map(copy(a:lst), 'extend(arr, v:val)')
+  return arr
 endfunction
